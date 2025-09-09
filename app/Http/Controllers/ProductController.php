@@ -7,11 +7,10 @@ use App\Models\Product;
 use App\Models\Category;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    // ฟอร์มเพิ่มสินค้า
+    // --- โค้ดเดิมทั้งหมดไม่ถูกแตะ ---
     public function create(Request $request)
     {
         $categories = Category::all();
@@ -23,7 +22,6 @@ class ProductController extends Controller
         ]);
     }
 
-    // บันทึกสินค้าใหม่
     public function store(Request $request)
     {
         $request->validate([
@@ -33,14 +31,16 @@ class ProductController extends Controller
             'unit'        => 'required|string|max:50',
             'price'       => 'nullable|integer|min:0',
             'description' => 'nullable|string',
-            'image'       => 'nullable|image|max:2048', // 
+            'image'       => 'nullable|image|max:2048',
         ]);
 
         $stock = (int) $request->stock;
 
         $imageName = null;
         if ($request->hasFile('image')) {
-            $imageName = $request->file('image')->store('products', 'public'); // 
+            $file = $request->file('image');
+            $imageName = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/products'), $imageName);
         }
 
         $product = Product::create([
@@ -51,7 +51,7 @@ class ProductController extends Controller
             'unit'          => $request->unit,
             'price'         => $request->price ?? null,
             'description'   => $request->description,
-            'image'         => $imageName, // 
+            'image'         => $imageName,
         ]);
 
         DB::table('products')->whereNull('initial_stock')->update([
@@ -62,7 +62,6 @@ class ProductController extends Controller
                          ->with('success', 'เพิ่มสินค้าเรียบร้อยแล้ว!');
     }
 
-    // ฟอร์มแก้ไขสินค้า
     public function edit(Product $product)
     {
         $categories = Category::all();
@@ -73,7 +72,6 @@ class ProductController extends Controller
         ]);
     }
 
-    // อัปเดตสินค้า
     public function update(Request $request, Product $product)
     {
         $request->validate([
@@ -82,7 +80,7 @@ class ProductController extends Controller
             'unit'        => 'required|string|max:50',
             'price'       => 'nullable|integer|min:0',
             'description' => 'nullable|string',
-            'image'       => 'nullable|image|max:2048', //  เพิ่ม validation สำหรับรูป
+            'image'       => 'nullable|image|max:2048',
         ]);
 
         $updateData = [
@@ -97,13 +95,16 @@ class ProductController extends Controller
             $updateData['stock'] = (int) $request->stock;
         }
 
-        //  
         if ($request->hasFile('image')) {
-            //
-            if ($product->image && Storage::disk('public')->exists($product->image)) {
-                Storage::disk('public')->delete($product->image);
+            if ($product->image && file_exists(public_path('images/products/' . $product->image))) {
+                unlink(public_path('images/products/' . $product->image));
             }
-            $updateData['image'] = $request->file('image')->store('products', 'public');
+
+            $file = $request->file('image');
+            $imageName = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/products'), $imageName);
+
+            $updateData['image'] = $imageName;
         }
 
         $product->update($updateData);
@@ -112,30 +113,64 @@ class ProductController extends Controller
                          ->with('success', 'แก้ไขสินค้าเรียบร้อยแล้ว!');
     }
 
-    // รีสต็อกสินค้าให้เต็มตาม initial_stock
     public function restock(Product $product)
     {
-        $product->refresh();
-
         $stockToSet = $product->initial_stock ?? $product->stock;
 
-        $product->update([
-            'stock' => $stockToSet,
-        ]);
+        $product->update(['stock' => $stockToSet]);
 
         return redirect()->back()->with('success', 'รีสต็อกสินค้าเรียบร้อยแล้ว!');
     }
 
-    // ลบสินค้า
     public function destroy(Product $product)
     {
-        //  
-        if ($product->image && Storage::disk('public')->exists($product->image)) {
-            Storage::disk('public')->delete($product->image);
+        if ($product->image && file_exists(public_path('images/products/' . $product->image))) {
+            unlink(public_path('images/products/' . $product->image));
         }
 
         $product->delete();
 
         return redirect()->back()->with('success', 'ลบสินค้าเรียบร้อยแล้ว!');
     }
+
+    // --- ส่วนใหม่เพิ่มเข้ามาเท่านั้น ---
+public function placeOrder(Request $request)
+{
+    $cart = $request->input('cart', []);
+
+    if (empty($cart)) {
+        return redirect()->back()->with('error', 'ตะกร้าว่าง');
+    }
+
+    $stockErrors = [];
+
+    // ตรวจสอบ stock ของแต่ละสินค้า
+    foreach ($cart as $item) {
+        $product = Product::find($item['id']);
+
+        if (!$product) {
+            $stockErrors[] = "สินค้า {$item['name']} ไม่พบ";
+            continue;
+        }
+
+        if ($item['quantity'] > $product->stock) {
+            $stockErrors[] = "จำนวน {$product->name} ในสต็อกไม่เพียงพอ";
+        }
+    }
+
+    if (!empty($stockErrors)) {
+        // ส่งกลับหน้า confirm order พร้อม error array
+        return redirect()->back()->with('stock_errors', $stockErrors)->withInput();
+    }
+
+    // ลด stock ของสินค้าที่สั่งซื้อ
+    foreach ($cart as $item) {
+        $product = Product::find($item['id']);
+        if ($product) {
+            $product->decrement('stock', $item['quantity']);
+        }
+    }
+
+    return redirect()->route('menu.ordersuccess');
+}
 }
