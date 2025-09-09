@@ -10,7 +10,7 @@ export default function ProductCreate({ categories }) {
     price: '',
     description: '',
     low_stock_threshold: 5,
-    image: null, 
+    image: null,
   });
 
   const submit = (e) => {
@@ -34,12 +34,12 @@ export default function ProductCreate({ categories }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-900 via-black to-red-800 p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-100 via-white to-red-200 p-6">
       <form
         onSubmit={submit}
-        className="bg-gradient-to-b from-gray-900 via-red-900 to-red-800 p-8 rounded-2xl shadow-2xl w-full max-w-lg"
+        className="bg-gradient-to-b from-red-700 via-white to-red-700 p-8 rounded-2xl shadow-2xl w-full max-w-lg"
       >
-        <h1 className="text-3xl font-bold mb-6 text-red-500 text-center tracking-wide">
+        <h1 className="text-3xl font-bold mb-6 text-red-800 text-center tracking-wide drop-shadow-md">
           เพิ่มเมนู
         </h1>
 
@@ -48,7 +48,7 @@ export default function ProductCreate({ categories }) {
           <select
             value={data.category_id}
             onChange={(e) => setData('category_id', e.target.value)}
-            className="w-full p-3 rounded-lg border border-red-600 bg-gray-800 text-white focus:ring-red-400 focus:border-red-400"
+            className="w-full p-3 rounded-lg border border-red-600 bg-white text-red-800 focus:ring-red-400 focus:border-red-400"
           >
             <option value="">-- เลือกหมวดหมู่ --</option>
             {categories.map((cat) => (
@@ -57,9 +57,7 @@ export default function ProductCreate({ categories }) {
               </option>
             ))}
           </select>
-          {errors.category_id && (
-            <p className="text-red-400 mt-1 text-sm">{errors.category_id}</p>
-          )}
+          {errors.category_id && <p className="text-red-600 mt-1 text-sm">{errors.category_id}</p>}
         </div>
 
         {/* ชื่อสินค้า */}
@@ -69,9 +67,9 @@ export default function ProductCreate({ categories }) {
             placeholder="ชื่อสินค้า"
             value={data.name}
             onChange={(e) => setData('name', e.target.value)}
-            className="w-full p-3 rounded-lg border border-red-600 bg-gray-800 text-white placeholder-gray-400 focus:ring-red-400 focus:border-red-400"
+            className="w-full p-3 rounded-lg border border-red-600 bg-white text-red-800 placeholder-red-400 focus:ring-red-400 focus:border-red-400"
           />
-          {errors.name && <p className="text-red-400 mt-1 text-sm">{errors.name}</p>}
+          {errors.name && <p className="text-red-600 mt-1 text-sm">{errors.name}</p>}
         </div>
 
         {/* จำนวน */}
@@ -81,24 +79,22 @@ export default function ProductCreate({ categories }) {
             placeholder="จำนวนสินค้า"
             value={data.stock}
             onChange={(e) => setData('stock', e.target.value)}
-            className="w-full p-3 rounded-lg border border-red-600 bg-gray-800 text-white placeholder-gray-400 focus:ring-red-400 focus:border-red-400"
+            className="w-full p-3 rounded-lg border border-red-600 bg-white text-red-800 placeholder-red-400 focus:ring-red-400 focus:border-red-400"
           />
-          <span className="absolute top-1 right-2 text-xl animate-pulse">⚡</span>
-          {errors.stock && <p className="text-red-400 mt-1 text-sm">{errors.stock}</p>}
+          <span className="absolute top-1 right-2 text-xl animate-pulse text-red-600">⚡</span>
+          {errors.stock && <p className="text-red-600 mt-1 text-sm">{errors.stock}</p>}
         </div>
 
         {/* จำนวนเริ่มต้น */}
-        <div className="mb-4 relative">
+        <div className="mb-4">
           <input
             type="number"
             placeholder="จำนวนเริ่มต้น (รีสต็อก)"
             value={data.initial_stock}
             onChange={(e) => setData('initial_stock', e.target.value)}
-            className="w-full p-3 rounded-lg border border-red-600 bg-gray-800 text-white placeholder-gray-400 focus:ring-red-400 focus:border-red-400"
+            className="w-full p-3 rounded-lg border border-red-600 bg-white text-red-800 placeholder-red-400 focus:ring-red-400 focus:border-red-400"
           />
-          {errors.initial_stock && (
-            <p className="text-red-400 mt-1 text-sm">{errors.initial_stock}</p>
-          )}
+          {errors.initial_stock && <p className="text-red-600 mt-1 text-sm">{errors.initial_stock}</p>}
         </div>
 
         {/* หน่วย */}
@@ -108,9 +104,9 @@ export default function ProductCreate({ categories }) {
             placeholder="หน่วย (เช่น จาน, ถาด)"
             value={data.unit}
             onChange={(e) => setData('unit', e.target.value)}
-            className="w-full p-3 rounded-lg border border-red-600 bg-gray-800 text-white placeholder-gray-400 focus:ring-red-400 focus:border-red-400"
+            className="w-full p-3 rounded-lg border border-red-600 bg-white text-red-800 placeholder-red-400 focus:ring-red-400 focus:border-red-400"
           />
-          {errors.unit && <p className="text-red-400 mt-1 text-sm">{errors.unit}</p>}
+          {errors.unit && <p className="text-red-600 mt-1 text-sm">{errors.unit}</p>}
         </div>
 
         {/* ราคา */}
@@ -120,9 +116,9 @@ export default function ProductCreate({ categories }) {
             placeholder="ราคา (ไม่บังคับ)"
             value={data.price}
             onChange={(e) => setData('price', e.target.value)}
-            className="w-full p-3 rounded-lg border border-red-600 bg-gray-800 text-white placeholder-gray-400 focus:ring-red-400 focus:border-red-400"
+            className="w-full p-3 rounded-lg border border-red-600 bg-white text-red-800 placeholder-red-400 focus:ring-red-400 focus:border-red-400"
           />
-          {errors.price && <p className="text-red-400 mt-1 text-sm">{errors.price}</p>}
+          {errors.price && <p className="text-red-600 mt-1 text-sm">{errors.price}</p>}
         </div>
 
         {/* รูปภาพ */}
@@ -131,9 +127,9 @@ export default function ProductCreate({ categories }) {
             type="file"
             accept="image/*"
             onChange={(e) => setData('image', e.target.files[0])}
-            className="w-full p-3 rounded-lg border border-red-600 bg-gray-800 text-white focus:ring-red-400 focus:border-red-400"
+            className="w-full p-3 rounded-lg border border-red-600 bg-white text-red-800 focus:ring-red-400 focus:border-red-400"
           />
-          {errors.image && <p className="text-red-400 mt-1 text-sm">{errors.image}</p>}
+          {errors.image && <p className="text-red-600 mt-1 text-sm">{errors.image}</p>}
         </div>
 
         {/* คำอธิบาย */}
@@ -142,19 +138,17 @@ export default function ProductCreate({ categories }) {
             placeholder="คำอธิบาย (ไม่บังคับ)"
             value={data.description}
             onChange={(e) => setData('description', e.target.value)}
-            className="w-full p-3 rounded-lg border border-red-600 bg-gray-800 text-white placeholder-gray-400 focus:ring-red-400 focus:border-red-400"
+            className="w-full p-3 rounded-lg border border-red-600 bg-white text-red-800 placeholder-red-400 focus:ring-red-400 focus:border-red-400"
             rows={3}
           />
-          {errors.description && (
-            <p className="text-red-400 mt-1 text-sm">{errors.description}</p>
-          )}
+          {errors.description && <p className="text-red-600 mt-1 text-sm">{errors.description}</p>}
         </div>
 
         {/* ปุ่ม */}
         <div className="flex justify-between items-center">
           <Link
             href="/dashboard"
-            className="px-4 py-2 bg-gray-800 text-red-500 hover:bg-red-700 hover:text-white rounded-lg shadow font-semibold transition"
+            className="px-4 py-2 bg-red-700 hover:bg-red-500 text-white rounded-lg shadow font-semibold transition"
           >
             กลับหน้า Dashboard
           </Link>
@@ -162,7 +156,7 @@ export default function ProductCreate({ categories }) {
           <button
             type="submit"
             disabled={processing}
-            className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg shadow font-semibold transition"
+            className="px-4 py-2 bg-red-700 hover:bg-red-500 text-white rounded-lg shadow font-semibold transition"
           >
             บันทึก
           </button>
