@@ -29,7 +29,7 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth');
 
 // ===========================
-//  routes (Dashboard, Category, Product)
+// routes (Dashboard, Category, Product)
 // ===========================
 Route::middleware(['auth'])->group(function () {
 
@@ -41,7 +41,7 @@ Route::middleware(['auth'])->group(function () {
         ]);
     })->name('dashboard');
 
-    // Category 
+    // Category
     Route::prefix('categories')->group(function () {
         Route::get('create', [CategoryController::class, 'create'])->name('categories.create');
         Route::post('/', [CategoryController::class, 'store'])->name('categories.store');
@@ -51,7 +51,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('{category}/products', [CategoryController::class, 'show'])->name('categories.products');
     });
 
-    // Product 
+    // Product
     Route::prefix('products')->group(function () {
         Route::get('create', [ProductController::class, 'create'])->name('products.create');
         Route::post('/', [ProductController::class, 'store'])->name('products.store');
@@ -63,7 +63,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // ===========================
-// User Menu routes 
+// User Menu routes
 // ===========================
 
 // หน้า QR Scan (หน้าแรก)
@@ -75,15 +75,15 @@ Route::get('/scan-qr', function () {
 Route::get('/menu', [MenuController::class, 'index'])
     ->name('menu.index');
 
-//  redirect GET confirm order
+// POST ตรวจสอบ stock และ confirm order
 Route::post('/menu/confirm', [MenuController::class, 'confirmOrderPost'])
     ->name('menu.confirm.post');
 
-// GET  แสดง confirm order
+// GET แสดง confirm order
 Route::get('/menu/confirm', [MenuController::class, 'confirmOrder'])
     ->name('menu.confirm');
 
-// POST  ยืนยันสั่งอาหาร
+// POST ยืนยันสั่งอาหาร (ตรวจสอบ stock อีกครั้งก่อนบันทึก)
 Route::post('/menu/place-order', [MenuController::class, 'placeOrder'])
     ->name('menu.place-order');
 
