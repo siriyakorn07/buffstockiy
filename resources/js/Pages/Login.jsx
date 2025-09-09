@@ -14,19 +14,19 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center w-full min-h-screen bg-gradient-to-br from-red-900 via-black to-red-800 p-6">
+    <div className="flex items-center justify-center w-full min-h-screen bg-gradient-to-br from-red-200 via-white to-red-200 p-6">
       <form
         onSubmit={submit}
-        className="bg-gradient-to-b from-gray-900 via-red-900 to-red-800 p-8 rounded-2xl shadow-2xl w-full max-w-md"
+        className="bg-gradient-to-b from-red-700 via-white to-red-700 p-8 rounded-2xl shadow-2xl w-full max-w-md"
       >
         {/* หัวเรื่อง */}
-        <h1 className="text-3xl font-bold mb-6 text-red-400 text-center tracking-wide">
+        <h1 className="text-3xl font-bold mb-6 text-red-700 text-center tracking-wide drop-shadow-md">
           เข้าสู่ระบบ
         </h1>
 
         {/* Error จาก backend */}
         {errors.email && (
-          <div className="mb-4 text-center text-red-300 text-sm">{errors.email}</div>
+          <div className="mb-4 text-center text-red-600 text-sm">{errors.email}</div>
         )}
 
         {/* Input Email */}
@@ -36,7 +36,7 @@ export default function Login() {
             value={data.email}
             placeholder="อีเมล"
             onChange={(e) => setData('email', e.target.value)}
-            className="w-full p-3 rounded-lg border border-red-600 bg-gray-800 text-white placeholder-gray-400 focus:ring-red-400 focus:border-red-400"
+            className="w-full p-3 rounded-lg border border-red-400 bg-white text-red-900 placeholder-red-400 focus:ring-red-500 focus:border-red-500"
           />
         </div>
 
@@ -47,7 +47,7 @@ export default function Login() {
             value={data.password}
             placeholder="รหัสผ่าน"
             onChange={(e) => setData('password', e.target.value)}
-            className="w-full p-3 rounded-lg border border-red-600 bg-gray-800 text-white placeholder-gray-400 focus:ring-red-400 focus:border-red-400"
+            className="w-full p-3 rounded-lg border border-red-400 bg-white text-red-900 placeholder-red-400 focus:ring-red-500 focus:border-red-500"
           />
         </div>
 
@@ -56,7 +56,9 @@ export default function Login() {
           type="submit"
           disabled={processing}
           className={`w-full text-lg font-semibold py-2 rounded-lg shadow ${
-            processing ? 'bg-red-400 cursor-not-allowed text-white' : 'bg-red-600 hover:bg-red-500 text-white'
+            processing
+              ? 'bg-red-300 cursor-not-allowed text-white'
+              : 'bg-red-600 hover:bg-red-500 text-white'
           } transition`}
         >
           {processing ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
