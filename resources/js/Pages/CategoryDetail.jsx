@@ -18,26 +18,26 @@ export default function CategoryDetail({ category, products }) {
   };
 
   return (
-    <div className="min-h-screen p-4 bg-gradient-to-br from-black via-red-950 to-red-800 text-white">
+    <div className="min-h-screen p-4 bg-gradient-to-br from-white via-red-100 to-red-800 text-gray-900">
 
       {/* ปุ่มกลับไป Dashboard และเพิ่มเมนู */}
       <div className="mb-4 flex justify-between items-center">
         <Link
           href="/dashboard"
-          className="px-3 py-1 bg-red-600 hover:bg-red-500 rounded-lg shadow font-semibold text-xs transition transform hover:scale-105"
+          className="px-3 py-1 bg-red-600 hover:bg-red-500 text-white rounded-lg shadow font-semibold text-xs transition transform hover:scale-105"
         >
           กลับไปหน้า Dashboard
         </Link>
 
         <Link
           href={`/products/create?category_id=${category.id}`}
-          className="px-3 py-1 bg-green-600 hover:bg-green-500 rounded-lg shadow font-semibold text-xs transition transform hover:scale-105"
+          className="px-3 py-1 bg-red-400 hover:bg-red-300 text-white rounded-lg shadow font-semibold text-xs transition transform hover:scale-105"
         >
           เพิ่มเมนู
         </Link>
       </div>
 
-      <h1 className="text-2xl font-extrabold mb-4 text-red-400 border-b border-red-600 pb-1">
+      <h1 className="text-2xl font-extrabold mb-4 text-red-700 border-b border-red-500 pb-1">
         {category.name}
       </h1>
 
@@ -48,20 +48,26 @@ export default function CategoryDetail({ category, products }) {
           return (
             <div
               key={product.id}
-              className="bg-gradient-to-br from-gray-900 to-red-900 p-3 rounded-lg shadow flex flex-col justify-between transition transform hover:scale-105 relative"
+              className="bg-gradient-to-br from-white via-red-200 to-red-500 p-3 rounded-lg shadow flex flex-col justify-between transition transform hover:scale-105 relative text-gray-900"
             >
               <div>
-                <h2 className="font-bold text-lg mb-1 text-red-400">{product.name}</h2>
-                <p className="text-gray-300 text-xs mb-1">
+                <h2 className="font-bold text-lg mb-1 text-red-700">{product.name}</h2>
+                <p className="text-gray-800 text-xs mb-1">
                   จำนวน: {product.stock} {product.unit}{" "}
                   {isLowStock && (
-                    <span className="inline-block ml-1 px-1 py-0.5 text-[10px] font-bold text-red-900 bg-red-400 rounded-full">
+                    <span className="inline-block ml-1 px-1 py-0.5 text-[10px] font-bold text-white bg-red-600 rounded-full">
                       ⚠️ Low
                     </span>
                   )}
                 </p>
-                {product.price && <p className="text-gray-300 text-xs mb-1">ราคา: {product.price} บาท</p>}
-                {product.description && <p className="text-gray-400 text-xs">{product.description}</p>}
+                {product.price && (
+                  <p className="text-gray-800 text-xs mb-1">
+                    ราคา: {product.price} บาท
+                  </p>
+                )}
+                {product.description && (
+                  <p className="text-gray-700 text-xs">{product.description}</p>
+                )}
               </div>
 
               {/* ปุ่มแก้ไข, ลบ, รีสต็อก */}
@@ -82,7 +88,7 @@ export default function CategoryDetail({ category, products }) {
 
                 <button
                   onClick={() => handleRestock(product.id)}
-                  className="px-2 py-1 bg-green-600 hover:bg-green-500 rounded shadow font-semibold text-white text-xs transition transform hover:scale-105"
+                  className="px-2 py-1 bg-red-400 hover:bg-red-300 rounded shadow font-semibold text-white text-xs transition transform hover:scale-105"
                 >
                   รีสต็อก
                 </button>
