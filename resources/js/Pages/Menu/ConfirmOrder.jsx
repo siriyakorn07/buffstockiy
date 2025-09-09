@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Inertia } from "@inertiajs/inertia";
 import { Link } from "@inertiajs/react";
 
-export default function ConfirmOrder({ cart, allCategories }) {
+export default function ConfirmOrder({ cart, allCategories, stock_errors }) {
   const [localCart, setLocalCart] = useState(cart || []);
   const [submitting, setSubmitting] = useState(false);
 
@@ -16,22 +16,14 @@ export default function ConfirmOrder({ cart, allCategories }) {
 
   const increase = (id) => {
     setLocalCart((prev) =>
-      prev.map((item) => {
-        const product = getProduct(item.id);
-        if (!product) return item;
-        return item.id === id && item.quantity < product.stock
-          ? { ...item, quantity: item.quantity + 1 }
-          : item;
-      })
+      prev.map((item) => (item.id === id ? { ...item, quantity: item.quantity + 1 } : item))
     );
   };
 
   const decrease = (id) => {
     setLocalCart((prev) =>
       prev
-        .map((item) =>
-          item.id === id ? { ...item, quantity: item.quantity - 1 } : item
-        )
+        .map((item) => (item.id === id ? { ...item, quantity: item.quantity - 1 } : item))
         .filter((item) => item.quantity > 0)
     );
   };
@@ -39,19 +31,7 @@ export default function ConfirmOrder({ cart, allCategories }) {
   const placeOrder = () => {
     if (!localCart || localCart.length === 0) return;
     setSubmitting(true);
-    Inertia.post(
-      "/menu/place-order",
-      { cart: localCart },
-      {
-        onSuccess: () => {
-          // Inertia.visit("/menu/order-success");
-        },
-        onFinish: () => {
-          setSubmitting(false);
-          setLocalCart([]);
-        },
-      }
-    );
+    Inertia.post("/menu/place-order", { cart: localCart }, { onFinish: () => setSubmitting(false) });
   };
 
   if (!localCart || localCart.length === 0) {
@@ -70,36 +50,44 @@ export default function ConfirmOrder({ cart, allCategories }) {
 
   return (
     <div className="min-h-screen p-6 bg-gradient-to-br from-red-100 via-white to-red-200 text-gray-900">
-      <h1 className="text-3xl font-bold mb-8 text-center text-red-600 drop-shadow">
-        ยืนยันออเดอร์
-      </h1>
+      <h1 className="text-3xl font-bold mb-8 text-center text-red-600 drop-shadow">ยืนยันออเดอร์</h1>
 
       <div className="space-y-6">
         {localCart.map((item, i) => {
           const product = getProduct(item.id);
           if (!product) return null;
 
+          // ตรวจสอบ stock error สำหรับสินค้านี้
+          const hasStockError = stock_errors && stock_errors[item.id];
+
           return (
             <div
               key={i}
-              className="flex justify-between items-center bg-white shadow rounded-lg p-4 border border-red-200"
+              className="flex flex-col justify-between bg-white shadow rounded-lg p-4 border border-red-200"
             >
-              <span className="text-lg font-medium">{product.name}</span>
-              <div className="flex items-center space-x-3">
-                <button
-                  onClick={() => decrease(item.id)}
-                  className="px-3 py-1 rounded bg-red-600 hover:bg-red-700 transition font-bold text-white"
-                >
-                  -
-                </button>
-                <span className="text-lg font-semibold">{item.quantity}</span>
-                <button
-                  onClick={() => increase(item.id)}
-                  className="px-3 py-1 rounded bg-red-600 hover:bg-red-700 transition font-bold text-white"
-                >
-                  +
-                </button>
+              <div className="flex justify-between items-center">
+                <span className="text-lg font-medium">{product.name}</span>
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={() => decrease(item.id)}
+                    className="px-3 py-1 rounded bg-red-600 hover:bg-red-700 transition font-bold text-white"
+                  >
+                    -
+                  </button>
+                  <span className="text-lg font-semibold">{item.quantity}</span>
+                  <button
+                    onClick={() => increase(item.id)}
+                    className="px-3 py-1 rounded bg-red-600 hover:bg-red-700 transition font-bold text-white"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
+
+              {/* ข้อความ stock error */}
+              {hasStockError && (
+                <p className="text-red-600 text-sm mt-1">{hasStockError}</p>
+              )}
             </div>
           );
         })}
@@ -117,10 +105,7 @@ export default function ConfirmOrder({ cart, allCategories }) {
         >
           {submitting
             ? "กำลังสั่ง..."
-            : `ยืนยันคำสั่ง (${localCart.reduce(
-                (total, i) => total + i.quantity,
-                0
-              )})`}
+            : `ยืนยันคำสั่ง (${localCart.reduce((total, i) => total + i.quantity, 0)})`}
         </button>
       </div>
     </div>
