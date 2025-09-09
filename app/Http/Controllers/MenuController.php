@@ -44,15 +44,24 @@ class MenuController extends Controller
         $cart = session('cart', []);
         $categories = Category::with('products')->get();
 
+        // ตรวจสอบ stock ของแต่ละสินค้า
+        $stock_errors = [];
+        foreach ($cart as $item) {
+            $product = Product::find($item['id']);
+            if ($product && $item['quantity'] > $product->stock) {
+                $stock_errors[$item['id']] = "จำนวนสินค้าไม่เพียงพอ กรุณารอสักครู่";
+            }
+        }
+
         return Inertia::render('Menu/ConfirmOrder', [
             'cart' => $cart,
             'allCategories' => $categories,
+            'stock_errors' => $stock_errors, // ส่งเป็น array key=id ของสินค้า
         ]);
     }
 
     public function placeOrder(Request $request)
     {
-        // ใช้จำนวนจาก POST แทน session
         $cart = $request->input('cart', []);
         if (empty($cart)) {
             return redirect()->route('menu.index')->with('error', 'ไม่มีสินค้าในตะกร้า');
@@ -67,12 +76,13 @@ class MenuController extends Controller
             $product = Product::find($item['id']);
             $quantity = intval($item['quantity'] ?? 0);
 
-            if (!$product || $quantity <= 0 || $product->stock < $quantity) {
+            if (!$product || $quantity <= 0) {
                 continue;
             }
 
-            // ลด stock ตามจำนวนล่าสุด
-            $product->decrement('stock', $quantity);
+            // ลด stock เท่าที่มี ไม่บล็อก
+            $quantityToDeduct = min($quantity, $product->stock);
+            $product->decrement('stock', $quantityToDeduct);
 
             OrderItem::create([
                 'order_id' => $order->id,
@@ -85,7 +95,6 @@ class MenuController extends Controller
         // ล้าง session cart
         session()->forget('cart');
 
-        // redirect ไปหน้า success
         return redirect()->route('menu.ordersuccess');
     }
 
