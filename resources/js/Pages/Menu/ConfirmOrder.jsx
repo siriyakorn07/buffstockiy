@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Inertia } from "@inertiajs/inertia";
 import { Link } from "@inertiajs/react";
 
-export default function ConfirmOrder({ cart, allCategories, stock_errors }) {
+export default function ConfirmOrder({ cart, allCategories }) {
   const [localCart, setLocalCart] = useState(cart || []);
   const [submitting, setSubmitting] = useState(false);
 
@@ -16,14 +16,20 @@ export default function ConfirmOrder({ cart, allCategories, stock_errors }) {
 
   const increase = (id) => {
     setLocalCart((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, quantity: item.quantity + 1 } : item))
+      prev.map((item) =>
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+      )
     );
   };
 
   const decrease = (id) => {
     setLocalCart((prev) =>
       prev
-        .map((item) => (item.id === id ? { ...item, quantity: item.quantity - 1 } : item))
+        .map((item) =>
+          item.id === id
+            ? { ...item, quantity: Math.max(0, item.quantity - 1) }
+            : item
+        )
         .filter((item) => item.quantity > 0)
     );
   };
@@ -31,8 +37,34 @@ export default function ConfirmOrder({ cart, allCategories, stock_errors }) {
   const placeOrder = () => {
     if (!localCart || localCart.length === 0) return;
     setSubmitting(true);
-    Inertia.post("/menu/place-order", { cart: localCart }, { onFinish: () => setSubmitting(false) });
+    console.log('success')
+    Inertia.post(
+      "/menu/place-order", 
+      { cart: localCart }, 
+      {
+      onSuccess: () => {
+        // redirect ไปหน้า OrderSuccess หลังสั่งสำเร็จ
+        //Inertia.visit("/menu/ordersuccess");
+      },
+
+      onFinish: () => {
+        setSubmitting(false)
+        setLocalCart([]);
+      },
+      }
+    );
   };
+
+  // ตรวจสอบ stock แบบ live (React state)
+  const liveStockErrors = {};
+  localCart.forEach((item) => {
+    const product = getProduct(item.id);
+    if (product && item.quantity > product.stock) {
+      liveStockErrors[item.id] = `จำนวนสินค้าไม่เพียงพอ (มีแค่ ${product.stock} ชิ้น)`;
+    }
+  });
+
+  const hasAnyStockError = Object.keys(liveStockErrors).length > 0;
 
   if (!localCart || localCart.length === 0) {
     return (
@@ -50,15 +82,16 @@ export default function ConfirmOrder({ cart, allCategories, stock_errors }) {
 
   return (
     <div className="min-h-screen p-6 bg-gradient-to-br from-red-100 via-white to-red-200 text-gray-900">
-      <h1 className="text-3xl font-bold mb-8 text-center text-red-600 drop-shadow">ยืนยันออเดอร์</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center text-red-600 drop-shadow">
+        ยืนยันออเดอร์
+      </h1>
 
       <div className="space-y-6">
         {localCart.map((item, i) => {
           const product = getProduct(item.id);
           if (!product) return null;
 
-          // ตรวจสอบ stock error สำหรับสินค้านี้
-          const hasStockError = stock_errors && stock_errors[item.id];
+          const hasStockError = liveStockErrors[item.id];
 
           return (
             <div
@@ -84,7 +117,6 @@ export default function ConfirmOrder({ cart, allCategories, stock_errors }) {
                 </div>
               </div>
 
-              {/* ข้อความ stock error */}
               {hasStockError && (
                 <p className="text-red-600 text-sm mt-1">{hasStockError}</p>
               )}
@@ -96,16 +128,21 @@ export default function ConfirmOrder({ cart, allCategories, stock_errors }) {
       <div className="mt-10 text-center">
         <button
           onClick={placeOrder}
-          disabled={submitting}
+          disabled={submitting || hasAnyStockError}
           className={`px-10 py-3 rounded-lg font-bold text-white transition shadow-lg ${
-            submitting
+            submitting || hasAnyStockError
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-gradient-to-r from-red-700 to-red-500 hover:from-red-600 hover:to-red-400"
           }`}
         >
           {submitting
             ? "กำลังสั่ง..."
-            : `ยืนยันคำสั่ง (${localCart.reduce((total, i) => total + i.quantity, 0)})`}
+            : hasAnyStockError
+            ? "ไม่สามารถยืนยัน (สต็อกไม่พอ)"
+            : `ยืนยันคำสั่ง (${localCart.reduce(
+                (total, i) => total + i.quantity,
+                0
+              )})`}
         </button>
       </div>
     </div>
