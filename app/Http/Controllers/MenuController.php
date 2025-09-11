@@ -33,6 +33,11 @@ class MenuController extends Controller
             ]);
         }
 
+        // แปลง quantity ให้แน่ใจว่าเป็น integer
+        foreach ($cart as &$item) {
+            $item['quantity'] = intval($item['quantity'] ?? 0);
+        }
+
         session(['cart' => $cart]);
 
         // Redirect ไปหน้า confirm
@@ -48,15 +53,17 @@ class MenuController extends Controller
         $stock_errors = [];
         foreach ($cart as $item) {
             $product = Product::find($item['id']);
-            if ($product && $item['quantity'] > $product->stock) {
-                $stock_errors[$item['id']] = "จำนวนสินค้าไม่เพียงพอ กรุณารอสักครู่";
+            $quantity = intval($item['quantity'] ?? 0);
+
+            if ($product && $quantity > $product->stock) {
+                $stock_errors[$item['id']] = "จำนวนสินค้าไม่เพียงพอ (มีแค่ {$product->stock} ชิ้น)";
             }
         }
 
         return Inertia::render('Menu/ConfirmOrder', [
             'cart' => $cart,
             'allCategories' => $categories,
-            'stock_errors' => $stock_errors, // ส่งเป็น array key=id ของสินค้า
+            'stock_errors' => $stock_errors,
         ]);
     }
 
@@ -67,6 +74,11 @@ class MenuController extends Controller
             return redirect()->route('menu.index')->with('error', 'ไม่มีสินค้าในตะกร้า');
         }
 
+        // แปลง quantity ให้แน่ใจว่าเป็น integer
+        foreach ($cart as &$item) {
+            $item['quantity'] = intval($item['quantity'] ?? 0);
+        }
+
         $order = Order::create([
             'user_id' => Auth::id(),
             'status' => 'pending'
@@ -74,7 +86,7 @@ class MenuController extends Controller
 
         foreach ($cart as $item) {
             $product = Product::find($item['id']);
-            $quantity = intval($item['quantity'] ?? 0);
+            $quantity = $item['quantity'];
 
             if (!$product || $quantity <= 0) {
                 continue;
