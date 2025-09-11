@@ -157,8 +157,8 @@ export default function ProductEdit({ product, categories }) {
         {/* ปุ่มย้อนกลับ / บันทึก */}
         <div className="flex justify-between items-center">
           <Link
-            href={`/categories/${data.category_id}`} // ใช้ category_id ของสินค้า
-            className="px-4 py-2 bg-red-900 text-white hover:bg-white hover:text-red-900 rounded-lg shadow font-semibold transition"
+             href={`/categories/${data.category_id}/products`} // เพิ่ม /products ต่อท้าย
+             className="px-4 py-2 bg-red-900 text-white hover:bg-white hover:text-red-900 rounded-lg shadow font-semibold transition"
           >
             ย้อนกลับ
           </Link>
