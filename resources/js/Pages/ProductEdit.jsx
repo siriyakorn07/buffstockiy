@@ -15,21 +15,8 @@ export default function ProductEdit({ product, categories }) {
 
   const submit = (e) => {
     e.preventDefault();
-
-    const formData = new FormData();
-    formData.append('category_id', data.category_id);
-    formData.append('name', data.name);
-    formData.append('stock', parseInt(data.stock, 10));
-    formData.append('initial_stock', parseInt(data.initial_stock, 10));
-    formData.append('low_stock_threshold', parseInt(data.low_stock_threshold, 10));
-    formData.append('unit', data.unit);
-    formData.append('price', data.price ? parseInt(data.price, 10) : 0);
-    formData.append('description', data.description);
-    if (data.image) formData.append('image', data.image);
-
-    put(`/products/${product.id}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    // ส่ง data object ตรง ๆ → ไม่ต้องสร้าง FormData
+    put(`/products/${product.id}`, data, { preserveScroll: true });
   };
 
   return (
@@ -79,7 +66,7 @@ export default function ProductEdit({ product, categories }) {
             type="number"
             value={data.stock}
             placeholder="จำนวน"
-            onChange={(e) => setData('stock', e.target.value)}
+            onChange={(e) => setData('stock', parseInt(e.target.value, 10) || 0)}
             className="w-full p-3 rounded-lg border border-red-600 bg-white text-red-800 placeholder-red-400 focus:ring-red-400 focus:border-red-400"
           />
           {errors.stock && <p className="text-red-500 mt-1 text-sm">{errors.stock}</p>}
@@ -91,7 +78,7 @@ export default function ProductEdit({ product, categories }) {
             type="number"
             value={data.initial_stock}
             placeholder="จำนวนเริ่มต้น (รีสต็อก)"
-            onChange={(e) => setData('initial_stock', e.target.value)}
+            onChange={(e) => setData('initial_stock', parseInt(e.target.value, 10) || 0)}
             className="w-full p-3 rounded-lg border border-red-600 bg-white text-red-800 placeholder-red-400 focus:ring-red-400 focus:border-red-400"
           />
           {errors.initial_stock && (
@@ -105,7 +92,7 @@ export default function ProductEdit({ product, categories }) {
             type="number"
             value={data.low_stock_threshold}
             placeholder="จำนวนขั้นต่ำเตือน"
-            onChange={(e) => setData('low_stock_threshold', e.target.value)}
+            onChange={(e) => setData('low_stock_threshold', parseInt(e.target.value, 10) || 0)}
             className="w-full p-3 rounded-lg border border-yellow-600 bg-white text-red-800 placeholder-yellow-400 focus:ring-yellow-400 focus:border-yellow-400"
           />
           {errors.low_stock_threshold && (
@@ -131,7 +118,7 @@ export default function ProductEdit({ product, categories }) {
             type="number"
             value={data.price}
             placeholder="ราคา (ไม่ใส่ก็ได้)"
-            onChange={(e) => setData('price', e.target.value)}
+            onChange={(e) => setData('price', parseInt(e.target.value, 10) || 0)}
             className="w-full p-3 rounded-lg border border-red-600 bg-white text-red-800 placeholder-red-400 focus:ring-red-400 focus:border-red-400"
           />
           {errors.price && <p className="text-red-500 mt-1 text-sm">{errors.price}</p>}
@@ -170,7 +157,7 @@ export default function ProductEdit({ product, categories }) {
         {/* ปุ่มย้อนกลับ / บันทึก */}
         <div className="flex justify-between items-center">
           <Link
-            href="/dashboard"
+            href={`/categories/${data.category_id}`} // ใช้ category_id ของสินค้า
             className="px-4 py-2 bg-red-900 text-white hover:bg-white hover:text-red-900 rounded-lg shadow font-semibold transition"
           >
             ย้อนกลับ
