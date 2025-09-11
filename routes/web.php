@@ -48,7 +48,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
         Route::put('{category}', [CategoryController::class, 'update'])->name('categories.update');
         Route::delete('{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
-        Route::get('{category}/products', [CategoryController::class, 'show'])->name('categories.products');
+        // แก้ตรงนี้: ใช้ {category} สำหรับ show แทน {category}/products
+        Route::get('{category}', [CategoryController::class, 'show'])->name('categories.show');
     });
 
     // Product
