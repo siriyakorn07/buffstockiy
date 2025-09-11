@@ -13,6 +13,8 @@ export default function ProductEdit({ product, categories }) {
     image: null,
   });
 
+    //
+    
   const submit = (e) => {
     e.preventDefault();
     // ส่ง data object ตรง ๆ → ไม่ต้องสร้าง FormData
